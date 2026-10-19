@@ -81,10 +81,23 @@ def run(sql, args=()):
     return cur.lastrowid
 
 
-def init_db():
-    """Cria as tabelas e o usuário admin inicial."""
+USUARIOS_PADRAO = [  # nome, e-mail, telefone, senha, perfil
+    ("Administrador Geral", "admin@farmacia.com", "75999999999", "admin123", "admin"),
+    ("Paula Farmaceutica", "farmaceutico@farmacia.com", "75988887777", "senha123", "farmaceutico"),
+    ("Carlos Atendente", "atendente@farmacia.com", "75988886666", "senha123", "atendente"),
+]
+
+
+def init_db(criar_padrao=True):
+    """Cria as tabelas e as contas iniciais (admin, farmacêutico e atendente).
+
+    O admin sempre existe. Farmacêutico e atendente de exemplo só são criados
+    se ainda não houver nenhum usuário com esse perfil.
+    """
     get_db().executescript(SCHEMA)
-    if not q("SELECT 1 FROM usuarios WHERE perfil='admin'", one=True):
-        run("INSERT INTO usuarios(nome_completo,email,telefone,senha_hash,perfil) VALUES(?,?,?,?,?)",
-            ("Administrador Geral", "admin@farmacia.com", "75999999999",
-             generate_password_hash("admin123"), "admin"))
+    for nome, email, tel, senha, perfil in USUARIOS_PADRAO:
+        if perfil != "admin" and not criar_padrao:
+            continue
+        if not q("SELECT 1 FROM usuarios WHERE perfil=?", (perfil,), one=True):
+            run("INSERT INTO usuarios(nome_completo,email,telefone,senha_hash,perfil) VALUES(?,?,?,?,?)",
+                (nome, email, tel, generate_password_hash(senha), perfil))

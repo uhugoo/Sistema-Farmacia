@@ -25,7 +25,7 @@ def create_app(config=None):
         return jsonify({"erro": "Rota não encontrada"}), 404
 
     with app.app_context():
-        init_db()
+        init_db(app.config.get("USUARIOS_PADRAO", True))
     return app
 
 
