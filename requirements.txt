@@ -1,9 +1,6 @@
-flask>=3.0
+
+Flask
 PyJWT>=2.7
 pytest
 selenium
-<<<<<<< Updated upstream
 gunicorn
-=======
-gunicorn
->>>>>>> Stashed changes
